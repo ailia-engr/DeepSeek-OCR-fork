@@ -47,6 +47,14 @@ from config import IMAGE_SIZE, BASE_SIZE, CROP_MODE, PRINT_NUM_VIS_TOKENS, PROMP
 _IMAGE_TOKEN = "<image>"
 
 
+def _normalize_config_section(section):
+    if isinstance(section, Dict):
+        return section
+    if isinstance(section, dict):
+        return Dict(section)
+    return section
+
+
 class DeepseekOCRProcessingInfo(BaseProcessingInfo):
 
     def get_hf_config(self):
@@ -276,10 +284,12 @@ class DeepseekOCRForCausalLM(nn.Module, SupportsMultiModal, SupportsPP):
         self.config = config
         self.multimodal_config = multimodal_config
 
-
-        self.vision_config = config.vision_config
-        self.projector_config = config.projector_config
-        self.text_config = config.text_config
+        self.vision_config = _normalize_config_section(getattr(config, "vision_config", {}))
+        self.projector_config = _normalize_config_section(getattr(config, "projector_config", {}))
+        text_cfg = getattr(config, "text_config", None)
+        if text_cfg is None:
+            text_cfg = getattr(config, "language_config", {})
+        self.text_config = _normalize_config_section(text_cfg)
 
         model_config = vllm_config.model_config
         tokenizer = cached_tokenizer_from_config(model_config)

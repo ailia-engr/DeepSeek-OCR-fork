@@ -10,11 +10,17 @@ IMAGE_SIZE = 640
 CROP_MODE = True
 MIN_CROPS= 2
 MAX_CROPS= 6 # max:9; If your GPU memory is small, it is recommended to set it to 6.
-MAX_CONCURRENCY = 100 # If you have limited GPU memory, lower the concurrency count.
+MAX_CONCURRENCY = 1 # If you have limited GPU memory, lower the concurrency count.
 NUM_WORKERS = 64 # image pre-process (resize/padding) workers 
 PRINT_NUM_VIS_TOKENS = False
 SKIP_REPEAT = True
 MODEL_PATH = 'deepseek-ai/DeepSeek-OCR' # change to your model path
+TOKENIZER_PATH = MODEL_PATH  # tokenizer source (quantized repo may omit tokenizer files)
+MODEL_VARIANTS = {
+    "standard": MODEL_PATH,
+    "quant": "sanchezalonsodavid17/DeepSeek-OCR-MBQ-Quantized-v1",  # 量子化モデル。事前に重みをダウンロードしておくこと。
+}
+DEFAULT_MODEL_VARIANT = "standard"
 
 # TODO: change INPUT_PATH
 # .pdf: run_dpsk_ocr_pdf.py; 
@@ -39,4 +45,4 @@ PROMPT = '<image>\n<|grounding|>Convert the document to markdown.'
 
 from transformers import AutoTokenizer
 
-TOKENIZER = AutoTokenizer.from_pretrained(MODEL_PATH, trust_remote_code=True)
+TOKENIZER = AutoTokenizer.from_pretrained(TOKENIZER_PATH, trust_remote_code=True)
