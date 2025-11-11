@@ -41,6 +41,7 @@ from deepencoder.sam_vary_sdpa import build_sam_vit_b
 from deepencoder.clip_sdpa import build_clip_l
 from deepencoder.build_linear import MlpProjector
 from addict import Dict
+from types import SimpleNamespace
 # import time
 from config import IMAGE_SIZE, BASE_SIZE, CROP_MODE, PRINT_NUM_VIS_TOKENS, PROMPT
 # The image token id may be various
@@ -48,10 +49,14 @@ _IMAGE_TOKEN = "<image>"
 
 
 def _normalize_config_section(section):
-    if isinstance(section, Dict):
+    if section is None:
+        return SimpleNamespace()
+    if isinstance(section, SimpleNamespace):
         return section
+    if isinstance(section, Dict):
+        return SimpleNamespace(**section)
     if isinstance(section, dict):
-        return Dict(section)
+        return SimpleNamespace(**section)
     return section
 
 
